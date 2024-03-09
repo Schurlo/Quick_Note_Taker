@@ -9,7 +9,7 @@ namespace Quick_Note_Taker
 {
     internal class Program
     {
-        static string fileName = "Notizen.txt"; 
+        static string file = "Notizen.txt"; 
 
         static void Main(string[] args)
         {
@@ -22,7 +22,7 @@ namespace Quick_Note_Taker
                     string dateTime = DateTime.Now.ToString("dd-MM-yy HH:mm");
                     string format = $"{dateTime} : {notiz} |";
 
-                    File.AppendAllText(fileName, format);
+                    File.AppendAllText(file, format);
                 }
                 else
                 {
@@ -38,9 +38,13 @@ namespace Quick_Note_Taker
                             Console.WriteLine("Die Notiz enthält ein ungültiges Zeichen: '|'.");
                             break;
 
+
                         case "/delete":
                             if (cmd[1] == "all")
-                                File.Delete(fileName);
+                            {
+                                File.Delete(file);
+                                Console.WriteLine("Notizen wurden gelöscht" + Environment.NewLine);
+                            }
                             else
                                 Delete(cmd[1]);
                                 break;
@@ -60,9 +64,7 @@ namespace Quick_Note_Taker
 
         static void Read()
         {
-            string file = File.ReadAllText(fileName);
-
-            string[] fileSplit = file.Split('|');
+            string[] fileSplit = Split();
 
             foreach(string line in fileSplit)
             {
@@ -73,8 +75,25 @@ namespace Quick_Note_Taker
 
         static void Delete(string StrID)
         {
-            int id = Convert.ToInt32(StrID);
+            int id = Convert.ToInt32(StrID) - 1;
 
+            string[] fileSplit = Split();
+            var list = fileSplit.ToList();
+            list.Remove(fileSplit[id]);
+
+            File.Delete(file);
+            foreach(string s in list)
+            {
+                File.AppendAllText(file, s);
+            }
+        }
+
+        static string[] Split()
+        {
+            string file = File.ReadAllText(Program.file);
+            string[] fileSplit = file.Split('|');
+
+            return fileSplit;
         }
     }
 }
